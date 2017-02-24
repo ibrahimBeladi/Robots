@@ -174,16 +174,17 @@ def uniformCostSearch(problem):
         if problem.isGoalState(node[0]):
             return node[1] # path returned
 
-        exploredSet.add(node[0]) # postion explored
+        exploredSet.add(node[0]) # position explored
 
     # getSuccessors returns a tuple of [(x,y), direction, # of steps]
 
         for position, direction, steps in problem.getSuccessors(node[0]):
+            child = node[1] + [direction]  # new path
+            cost = problem.getCostOfActions(child)
             if not position in exploredSet:
-                child = node[1] + [direction] # new path
-                cost = problem.getCostOfActions(child) # g(n)
                 frontier.push((position, child), cost)
-    return []
+
+    util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -217,11 +218,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     # getSuccessors returns a tuple of [(x,y), direction, # of steps]
 
         for position, direction, steps in problem.getSuccessors(node[0]):
+            child = node[1] + [direction]  # new path
+            cost = problem.getCostOfActions(child) + heuristic(position, problem)  # g(n) + h(n)
             if not position in exploredSet:
-                child = node[1] + [direction] # new path
-                cost = problem.getCostOfActions(child) + heuristic(position, problem) # g(n) + h(n)
                 frontier.push((position, child), cost)
-    return []
+
+    util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch
