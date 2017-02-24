@@ -212,7 +212,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         if problem.isGoalState(node[0]):
             return node[1] # path returned
 
-        exploredSet.add(node[0]) # postion explored
+        exploredSet.add(node[0]) # position explored
 
     # getSuccessors returns a tuple of [(x,y), direction, # of steps]
 
