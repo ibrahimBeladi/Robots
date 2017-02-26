@@ -174,11 +174,13 @@ class PriorityQueue:
         # FIXED: restored to stable behaviour
         entry = (priority, self.count, item)
         # entry = (priority, item)
+
+
         heapq.heappush(self.heap, entry)
         self.count += 1
 
     def pop(self):
-        (_, _, item) = heapq.heappop(self.heap)
+        (p, c, item) = heapq.heappop(self.heap)
         #  (_, item) = heapq.heappop(self.heap)
         return item
 

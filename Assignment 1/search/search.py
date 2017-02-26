@@ -162,25 +162,31 @@ def uniformCostSearch(problem):
 
     initState = problem.getStartState()
     frontier = util.PriorityQueue()
+    # print 'init pushing: ', initState, heuristic(initState, problem)
     frontier.push((initState, []), 0)
     exploredList = []
-    exploredSet = set(exploredList)
+    exploredSet = exploredList
+    ##
 
 
 
     while not frontier.isEmpty():
         node = frontier.pop()
 
+        if node[0] in exploredSet:
+            continue # pop another one
+
+        exploredSet.append(node[0]) # position explored
+
         if problem.isGoalState(node[0]):
             return node[1] # path returned
 
-        exploredSet.add(node[0]) # position explored
 
     # getSuccessors returns a tuple of [(x,y), direction, # of steps]
 
         for position, direction, steps in problem.getSuccessors(node[0]):
             child = node[1] + [direction]  # new path
-            cost = problem.getCostOfActions(child)
+            cost = problem.getCostOfActions(child)  # g(n)
             if not position in exploredSet:
                 frontier.push((position, child), cost)
 
@@ -201,7 +207,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     initState = problem.getStartState()
     frontier = util.PriorityQueue()
-    frontier.push((initState, []), 0)
+    # print 'init pushing: ', initState, heuristic(initState, problem)
+    frontier.push((initState, []), heuristic(initState, problem))
     exploredList = []
     exploredSet = exploredList
     ##
@@ -211,10 +218,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while not frontier.isEmpty():
         node = frontier.pop()
 
+        if node[0] in exploredSet:
+            continue
+
+        exploredSet.append(node[0]) # position explored
+
         if problem.isGoalState(node[0]):
             return node[1] # path returned
 
-        exploredSet.append(node[0]) # position explored
 
     # getSuccessors returns a tuple of [(x,y), direction, # of steps]
 
