@@ -203,7 +203,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     frontier = util.PriorityQueue()
     frontier.push((initState, []), 0)
     exploredList = []
-    exploredSet = set(exploredList)
+    exploredSet = exploredList
 
 
 
@@ -213,7 +213,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         if problem.isGoalState(node[0]):
             return node[1] # path returned
 
-        exploredSet.add(node[0]) # position explored
+        exploredSet.append(node[0]) # position explored
 
     # getSuccessors returns a tuple of [(x,y), direction, # of steps]
 
