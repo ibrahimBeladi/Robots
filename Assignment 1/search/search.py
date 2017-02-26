@@ -204,6 +204,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     frontier.push((initState, []), 0)
     exploredList = []
     exploredSet = exploredList
+    ##
 
 
 
