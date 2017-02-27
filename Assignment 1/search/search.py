@@ -140,7 +140,7 @@ def breadthFirstSearch(problem):
     fringe = util.Queue()
     exploredList = []
     # a set of already expanded nodes
-    exploredSet = set(exploredList)
+    exploredSet = exploredList # better to use a list
     startState = problem.getStartState()
 
     if problem.isGoalState(startState):return None
@@ -149,7 +149,7 @@ def breadthFirstSearch(problem):
     while not fringe.isEmpty():
         node = fringe.pop()
         if node[-1][0] not in exploredSet:
-            exploredSet.add(node[-1][0])
+            exploredSet.append(node[-1][0])
             if problem.isGoalState(node[-1][0]):return getPlan(node)
             for i,j,k in problem.getSuccessors(node[-1][0]):
                     fringe.push(node+[(i,j,k)])
@@ -167,8 +167,6 @@ def uniformCostSearch(problem):
     exploredList = []
     exploredSet = exploredList
     ##
-
-
 
     while not frontier.isEmpty():
         node = frontier.pop()

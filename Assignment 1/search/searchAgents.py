@@ -395,8 +395,8 @@ def cornersHeuristic(state, problem):
 
 def euclideanHeuristic2(corner, state):
     "The Euclidean distance heuristic for a PositionSearchProblem"
-    xy1 = state
-    xy2 = corner
+    xy1 = corner
+    xy2 = state
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
 def manhattanHeuristic2(corner, state):
