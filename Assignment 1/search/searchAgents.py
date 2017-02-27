@@ -391,7 +391,7 @@ def cornersHeuristic(state, problem):
         value = manhattanHeuristic2(corner, state[0])
         hValues.append(value)
 
-    return max(hValues)
+    return max(hValues) # larger heuristic is better, as the slides say!
 
 def euclideanHeuristic2(corner, state):
     "The Euclidean distance heuristic for a PositionSearchProblem"
