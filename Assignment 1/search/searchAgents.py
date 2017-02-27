@@ -388,10 +388,10 @@ def cornersHeuristic(state, problem):
 
     hValues = []
     for corner in state[1]:
-        value = euclideanHeuristic2(corner, state[0])
+        value = manhattanHeuristic2(corner, state[0])
         hValues.append(value)
 
-    return min(hValues)
+    return max(hValues)
 
 def euclideanHeuristic2(corner, state):
     "The Euclidean distance heuristic for a PositionSearchProblem"
