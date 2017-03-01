@@ -499,21 +499,26 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
-    theList = foodGrid.asList()
+    theList = foodGrid.asList() #  this line is to get all the food grids in a list data structure
+    listOfPaths = []
 
     if not theList:
-        return 0
+        return 0 # if there is no food, the game is terminated
 
-    # The following solution is fast but it gives 4 out of 5 points!
-    #return max(manhattan_distance(position, i) for i in theList)
+    for i in theList:
+        listOfPaths.append(len((search.aStarSearch(PositionSearchProblem(problem.startingGameState, start=position, goal=i, warn=False), heuristic = manhattanHeuristic))))
 
-    return max(shortest_path(position, i, problem) for i in theList) # this solution is a slow but it gives 6/5 points. LoL
 
-def shortest_path(start, goal, problem):
-    # print "searching shortest path"
-    new_problem = PositionSearchProblem(problem.startingGameState, start = start, goal = goal, warn = False)
-    return len(search.aStarSearch(new_problem, heuristic = manhattanHeuristic))
+    """
+    an explanation of the solution is as follows:
+    if the board contains no food pellet then return 0
+    else we should get the girds of the food pellet in the list. we can obtain that by calling the function asList() from foodGrid class
+    after that we are running an aStarSearch on these grid paths and checking the length of each. we are interested in the max path
+    because if I am returning the minimum, it might leat to longer way to reach the goal. "not 100% sure of the reason"
+    the heuristic used is manhattanHeuristic.
+    """
 
+    return max(listOfPaths)
 
 
 class ClosestDotSearchAgent(SearchAgent):
