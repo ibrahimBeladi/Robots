@@ -1,68 +1,68 @@
 DFS
- Warsaw
- Warsaw-Budapest
- Warsaw-Budapest-Munich
- Warsaw-Budapest-Munich-Rome
+1 W
+2 W-B
+3 W-B-M
+4 W-B-M-R
 
--> Warsaw-Budapest-Munich-Rome
+-> W-B-M-R
 
 
 BFS
- Warsaw
- Warsaw-Budapest
- Warsaw-Munich
-Warsaw-Odesa
-Warsaw-Budapest-Munich
-Warsaw-Munich-Budapest
-Warsaw-Munich-Rome
-Warsaw-Munich-Venice
+1 W
+2 W-B
+3 W-M
+4 W-O
+5 W-B-M
+6 W-M-B
+7 W-M-R
+W-M-V
 
--> Warsaw-Munich-Rome
+-> W-M-R
 
 
 UCS
- Warsaw 0
- Warsaw-Odesa 6
- Warsaw-Budapest 9
- Warsaw-Munich 15
- Warsaw-Munich-Venice 18
- Warsaw-Odesa-Venice 20
- Warsaw-Budapest-Munich 21
- Warsaw-Odesa-Venice-Munich 23
- Warsaw-Budapest-Munich-Venice 24
- Warsaw-Munich-Venice-Rome 24
-Warsaw-Odesa-Venice-Rome 26
-Warsaw-Budapest-Munich-Venice-Rome 30
-Warsaw-Munich-Rome 30
-Warsaw-Munich-Venice-Odesa 32
-Warsaw-Odesa-Venice-Munich-Budapest 35
-Warsaw-Budapest-Munich-Rome 36
-Warsaw-Budapest-Munich-Venice-Odesa 38
-Warsaw-Odesa-Venice-Munich-Rome 38
+1 W 0
+2 W-O 6
+3 W-B 9
+4 W-M 15
+5 W-M-V 18
+6 W-O-V 20
+7 W-B-M 21
+8 W-O-V-M 23
+9 W-B-M-V 24
+10W-M-V-R 24
+W-O-V-R 26
+W-B-M-V-R 30
+W-M-R 30
+W-M-V-O 32
+W-O-V-M-B 35
+W-B-M-R 36
+W-B-M-V-O 38
+W-O-V-M-R 38
 
--> Warsaw-Munich-Venice-Rome 24
+-> W-M-V-R 24
 
 
 Greedy
-1Warsaw 30
-2Warsaw-Munich 3
-Warsaw-Budapest 12
-Warsaw-Odesa 20
-Warsaw-Munich-Budapest 12
-Warsaw-Munich-Venice 3
-3Warsaw-Munich-Rome 0
+1 W 30
+2 W-M 3
+W-B 12
+W-O 20
+W-M-B 12
+W-M-V 3
+3 W-M-R 0
 
-->  Warsaw-Munich-Rome
+->  W-M-R
 
 A*
-1Warsaw 0+30=30
-2Warsaw-Munich 15+3=18
-Warsaw-Budapest 9+12=21
-Warsaw-Odesa 6+20=26
-Warsaw-Munich-Budapest 27+12=39
-3Warsaw-Munich-Venice 18+3=21
-Warsaw-Munich-Rome 30+0=30
-Warsaw-Munich-Venice-Odesa 18+14=32
- Warsaw-Munich-Venice-Rome 18+6=24
+1 W 0+30=30
+2 W-M 15+3=18
+3 W-B 9+12=21
+W-O 6+20=26
+W-M-B 27+12=39
+4 W-M-V 18+3=21
+W-M-R 30+0=30
+W-M-V-O 18+14=32
+5 W-M-V-R 18+6=24
 
--> Warsaw-Munich-Venice-Rome
+-> W-M-V-R
