@@ -24,15 +24,15 @@ public class NQueens {
 			long y = System.currentTimeMillis();
 			
 			// initiate the game
-			initiate(1);		
+			initiate();		
 			
 			long x = System.currentTimeMillis();
 			
 			while(thereAreConflicts()) {
 				
 				// flush after a certain amount of time
-				if((System.currentTimeMillis() - x)/1000.0 > N/50) {					
-					initiate(1);				
+				if((System.currentTimeMillis() - x)/1000.0 > N/100.0) {					
+					initiate();				
 					x = System.currentTimeMillis();
 					continue;
 				}
@@ -75,6 +75,7 @@ public class NQueens {
 		}
 		
 		System.out.println("Average: " + sum/tries);
+		
 	}
 	
 	private static boolean thereAreConflicts() {
@@ -86,13 +87,12 @@ public class NQueens {
 		return false;
 	}
 
-	private static void initiate(int j) {
-		Q.clear(); // clear the list, if it is not cleared (used in flush)
+	private static void initiate() {
 		
-		// j is used if we need to flush. First initiating is already '\u0000' so no need to enter the loop
-		if (j == 1)
-			for(int i = 0; i < N; i++)
-				Arrays.fill(board[i], '\u0000');
+		for(Queen q : Q)
+			board[q.x][q.y] = '\u0000';
+		
+		Q.clear(); // clear the list, if it is not cleared (used in flush)
 		
 		int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
 		
