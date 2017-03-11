@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	static int N = 50;
+	static int N = 60;
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static char[][] board = new char[N][N];
 	
@@ -47,7 +47,7 @@ public class NQueens {
 				Queen q = list.get(randomNum);
 	
 				// move it
-				board[q.x][q.y] = '0'; // free current position
+				board[q.x][q.y] = '\u0000'; // free current position
 				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
 				for(int k = 0; k < N; k++) {
 					if (k == q.y && coin == 1)
