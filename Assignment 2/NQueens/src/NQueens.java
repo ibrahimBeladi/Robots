@@ -56,8 +56,7 @@ public class NQueens {
 				
 				board[q.x][minIndex] = 'Q';
 				q.y = minIndex;
-				computeConflicts();
-				
+
 				// update others
 				for(Queen queen : Q)
 					queen.conflicts = getAttacks(queen.x, queen.y);
@@ -201,7 +200,6 @@ public class NQueens {
 		Q.add(q);
 		
 		board[i][minIndex] = 'Q';
-		computeConflicts();
 		
 		for(Queen queen : Q)
 			queen.conflicts = getAttacks(queen.x, queen.y);
