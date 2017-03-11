@@ -200,7 +200,6 @@ public class NQueens {
 		Q.add(q);
 		
 		board[i][minIndex] = 'Q';
-		
 		for(Queen queen : Q)
 			queen.conflicts = getAttacks(queen.x, queen.y);
 		
