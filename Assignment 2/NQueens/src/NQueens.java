@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	static int N = 100;
+	static int N = 50;
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static char[][] board = new char[N][N];
 	
@@ -19,45 +19,50 @@ public class NQueens {
 		int tries = 0;
 		
 		while(tries < 10) {
+			
 			long y = System.currentTimeMillis();
 			
+			// initiate the game
 			initiate(1);		
+			
 			long x = System.currentTimeMillis();
+			
 			while(thereAreConflicts()) {
 				
-				// Flush after a certain amount of time
+				// flush after a certain amount of time
 				if((System.currentTimeMillis() - x)/1000.0 > N/5) {					
 					initiate(1);				
 					x = System.currentTimeMillis();
 					continue;
 				}
 				
-				// pick any conflicting item
+				// pick any conflicting queen
 				ArrayList<Queen> list = new ArrayList<>(); // contains list of conflicting queens
 				for(Queen q : Q)
 					if(q.conflicts != 0)
 						list.add(q);
 				
-				int randomNum = ThreadLocalRandom.current().nextInt(0, list.size());
-				int coin = ThreadLocalRandom.current().nextInt(0, 2);
+				int randomNum = ThreadLocalRandom.current().nextInt(0, list.size()); // pick a random conflicting queen
+				int coin = ThreadLocalRandom.current().nextInt(0, 2); // increase randomness, decides to pick the current location again
 				Queen q = list.get(randomNum);
 	
 				// move it
-				board[q.x][q.y] = '0';
-				int attacks[] = new int[N];
+				board[q.x][q.y] = '0'; // free current position
+				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
 				for(int k = 0; k < N; k++) {
 					if (k == q.y && coin == 1)
-						attacks[k] = Integer.MAX_VALUE;
+						attacks[k] = Integer.MAX_VALUE; // do not pick the current location again
 					else
 						attacks[k] = getAttacks(q.x, k);
 					}
 				
-				int minIndex = findMinIdx(attacks, q.y);
+				int minIndex = findMinIdx(attacks); // least conflicting cell to put a queen
 				
+				// update the board
 				board[q.x][minIndex] = 'Q';
 				q.y = minIndex;
 
-				// update others
+				// update others, the location may attack others
 				for(Queen queen : Q)
 					queen.conflicts = getAttacks(queen.x, queen.y);
 				
@@ -69,6 +74,7 @@ public class NQueens {
 	}
 	
 	private static boolean thereAreConflicts() {
+		// return false if there are no conflicts
 		for(Queen q : Q)
 			if(q.conflicts != 0)
 				return true;
@@ -77,32 +83,26 @@ public class NQueens {
 	}
 
 	private static void initiate(int j) {
-		Q.clear();
+		Q.clear(); // clear the list, if it is not cleared (used in flush)
 		
+		// j is used if we need to flush. First initiating is already '\u0000' so no need to enter the loop
 		if (j == 1)
 			for(int i = 0; i < N; i++)
 				Arrays.fill(board[i], '\u0000');
 		
-		int[] ints = new Random().ints(0, N).distinct().limit(N).toArray();
+		int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
 		
+		// A queen is put on a random row
 		int k = N-1;
 		while(k > 0) {
 			putQueen(ints[k]);
 			k--;
 		}
 	}
-
-	private static void computeConflicts() {
-		
-		for(int i = 0; i < N; i++) {
-			for(int j = 0; j < N; j++)
-				getAttacks(i, j);
-		}
-		
-		//printBoard();
-	}
 	
-	private static int getAttacks(int i, int j) {		
+	private static int getAttacks(int i, int j) {	
+		// returns how many attacks are on a given cell (i, j)
+		
 		int attacks = 0;
 		
 		// attacks within row
@@ -190,22 +190,25 @@ public class NQueens {
 
 
 	private static void putQueen(int i) {
+		// places a queen on the least conflicting column, in the row i
 		
 		int[] attacks = new int[N];
 		for(int k = 0; k < N; k++)
 			attacks[k] = getAttacks(i, k);
 		
-		int minIndex = findMinIdx(attacks, -1);
-		Queen q = new Queen(i, minIndex, getAttacks(i, minIndex));
-		Q.add(q);
+		int minIndex = findMinIdx(attacks); // index of least conflicting column
+		Queen q = new Queen(i, minIndex, getAttacks(i, minIndex)); // object carries useful info about a queen
+		Q.add(q); // put it on a list
 		
-		board[i][minIndex] = 'Q';
+		board[i][minIndex] = 'Q'; // update the board
+		
+		// update others, the location may attack others
 		for(Queen queen : Q)
 			queen.conflicts = getAttacks(queen.x, queen.y);
 		
 	}
 	
-	public static int findMinIdx(int[] numbers, int y) {
+	public static int findMinIdx(int[] numbers) {
 	    if (numbers == null || numbers.length == 0) return -1; // Saves time for empty array
 	    // As pointed out by ZouZou, you can save an iteration by assuming the first index is the smallest
 	    int minVal = numbers[0]; // Keeps a running count of the smallest value so far
