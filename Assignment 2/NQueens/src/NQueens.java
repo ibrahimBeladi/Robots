@@ -10,13 +10,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	static int N = 60;
+	static int N = 1000;
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static char[][] board = new char[N][N];
 	
 	public static void main(String[] args) throws InterruptedException {
 		
 		int tries = 0;
+		double sum = 0.0;
 		
 		while(tries < 10) {
 			
@@ -30,7 +31,7 @@ public class NQueens {
 			while(thereAreConflicts()) {
 				
 				// flush after a certain amount of time
-				if((System.currentTimeMillis() - x)/1000.0 > N/5) {					
+				if((System.currentTimeMillis() - x)/1000.0 > N/50) {					
 					initiate(1);				
 					x = System.currentTimeMillis();
 					continue;
@@ -53,7 +54,7 @@ public class NQueens {
 					if (k == q.y && coin == 1)
 						attacks[k] = Integer.MAX_VALUE; // do not pick the current location again
 					else
-						attacks[k] = getAttacks(q.x, k);
+						attacks[k] = getAttacks(q.x, k)-1;
 					}
 				
 				int minIndex = findMinIdx(attacks); // least conflicting cell to put a queen
@@ -67,10 +68,13 @@ public class NQueens {
 					queen.conflicts = getAttacks(queen.x, queen.y);
 				
 			}
-			
-			System.out.println("Finished in: " + (System.currentTimeMillis() - y)/1000.0 + " secs!");
+			double time = ((System.currentTimeMillis() - y)/1000.0);
+			System.out.println("Finished in: " + time + " secs!");
+			sum = sum + time;
 			tries++;
 		}
+		
+		System.out.println("Average: " + sum/tries);
 	}
 	
 	private static boolean thereAreConflicts() {
