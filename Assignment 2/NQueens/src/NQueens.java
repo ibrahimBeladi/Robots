@@ -4,9 +4,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	final static int TRIALS = 50;
-	final static int N = 100;
-	static double timeToFlush = N/500.0; // this value should be tuned manually (time to re-initiate), should increase as N increases
+	final static int TRIALS = 10;
+	final static int N = 1000;
+	static double timeToFlush = N/43.0; // this value should be tuned manually (time to re-initiate), should increase as N increases
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static boolean[][] board = new boolean[N][N];
 
@@ -41,23 +41,28 @@ public class NQueens {
 						list.add(q);
 
 				int randomNum = ThreadLocalRandom.current().nextInt(0, list.size()); // pick a random conflicting queen
-				int coin = ThreadLocalRandom.current().nextInt(0, 2); // increase randomness, decides to pick the current location again
 				Queen q = list.get(randomNum);
 
 				// move it
 				board[q.x][q.y] = false; // free current position
 				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
 				for (int k = 0; k < N; k++) {
-					if (k == q.y && coin == 1)
-						attacks[k] = Integer.MAX_VALUE; // do not pick the current location again
-					else
-						attacks[k] = getAttacks(q.x, k);
+					attacks[k] = getAttacks(q.x, k);
 				}
+				
+				// pick one of the least conflicting cells
+				int minIndex = findMinIdx(attacks); 
+				int minValue = attacks[minIndex];
+				ArrayList<Integer> equalMin = new ArrayList<>();
+				for(int k = 0; k < attacks.length; k++)
+					if(attacks[k] == minValue)
+						equalMin.add(k);
 
-				int minIndex = findMinIdx(attacks); // least conflicting cell to put a queen
-
+				int randomIdx = ThreadLocalRandom.current().nextInt(0, equalMin.size()); // pick a random conflicting queen
+				int finalIdx = equalMin.get(randomIdx);
+				
 				// update the board
-				board[q.x][minIndex] = true;
+				board[q.x][finalIdx] = true;
 				q.y = minIndex;
 
 				// update others, the location may attack others
@@ -69,6 +74,7 @@ public class NQueens {
 			System.out.print(time + " secs!\n");
 			sum = sum + time;
 			tries++;
+			//printBoard();
 		}
 
 		System.out.println("\nAverage of "+TRIALS+" runs: " + sum / tries);
@@ -95,12 +101,12 @@ public class NQueens {
 		// clear the list, if it is not cleared (used in flush)
 		Q = new ArrayList<>();
 
-		int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
+		//int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
 
 		// A queen is put on a random row
 		int k = N - 1;
 		while (k >= 0) {
-			putQueen(ints[k]);
+			putQueen(k);
 			k--;
 		}
 	}
@@ -110,7 +116,7 @@ public class NQueens {
 
 		int attacks = 0;
 
-		// attacks within row
+//		 attacks within row
 		for (int k = 0; k < N; k++)
 			if (board[i][k] && k != j)
 				attacks++;
@@ -182,14 +188,6 @@ public class NQueens {
 		// places a queen on the least conflicting column, in the row i
 
 		int randomNum = ThreadLocalRandom.current().nextInt(0, N); // pick a random number as column index
-
-		//		We should not do this!
-
-		//int[] attacks = new int[N];
-		//for (int k = 0; k < N; k++)
-		//attacks[k] = getAttacks(i, k);
-		//int minIndex = findMinIdx(attacks); // index of least conflicting column
-		//randomNum = minIndex;
 
 		Queen q = new Queen(i, randomNum, getAttacks(i, randomNum)); // object carries useful info about a queen
 		Q.add(q); // put it on a list
