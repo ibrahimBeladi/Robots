@@ -5,8 +5,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NQueens {
 
 	final static int TRIALS = 50;
-	final static int N = 1000;
-	static int timeToFlush = N/100; // this value should be tuned manually (time to re-initiate), should increase as N increases
+	final static int N = 100;
+	static double timeToFlush = N/500.0; // this value should be tuned manually (time to re-initiate), should increase as N increases
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static boolean[][] board = new boolean[N][N];
 
