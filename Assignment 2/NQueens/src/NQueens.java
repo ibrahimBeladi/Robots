@@ -1,17 +1,26 @@
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
 	final static int TRIALS = 10;
 	final static int N = 1000;
-	static double timeToFlush = N/43.0; // this value should be tuned manually (time to re-initiate), should increase as N increases
+	/*
+	if you find a better number listed here
+	you can also use new values for n=50,150,250,500,750...
+	n			t2f
+	1			0.0001
+	10			0.00635
+	100			0.5
+	1000		22.13594362
+
+	 */
+	static double timeToFlush =  ((0.00005178-0.00000003*N)*N + 0.00011936)*N; // this value should be tuned manually (time to re-initiate), should increase as N increases
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static boolean[][] board = new boolean[N][N];
-
+	
 	public static void main(String[] args) throws InterruptedException {
-
+		int timeouts = 0;
 		System.out.println("The board is " + N + "*" + N);
 		int tries = 0;
 		double sum = 0.0;
@@ -24,14 +33,14 @@ public class NQueens {
 			initiate();
 
 			long x = System.currentTimeMillis();
-
 			while (thereAreConflicts()) {
 
 				// flush after a certain amount of time
 				if ((System.currentTimeMillis() - x) / 1000.0 > timeToFlush) {
 					initiate();
 					x = System.currentTimeMillis();
-					continue;
+					timeouts++;
+//					continue;
 				}
 
 				// pick any conflicting queen
@@ -78,6 +87,7 @@ public class NQueens {
 		}
 
 		System.out.println("\nAverage of "+TRIALS+" runs: " + sum / tries);
+		System.out.println("timeouts = "+timeouts);
 		//printBoard();
 
 	}
