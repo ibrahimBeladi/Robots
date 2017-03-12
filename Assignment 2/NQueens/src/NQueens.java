@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NQueens {
 
 	final static int TRIALS = 10;
-	final static int N = 1000;
+	final static int N = 100;
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static boolean[][] board = new boolean[N][N];
 
@@ -27,7 +27,7 @@ public class NQueens {
 			while (thereAreConflicts()) {
 
 				// flush after a certain amount of time
-				if ((System.currentTimeMillis() - x) / 1000.0 > N / 100.0) {
+				if ((System.currentTimeMillis() - x) / 1000.0 > N / 500.0) { // this value (N/num) should be tuned manually (time to re-initiate), should increase as N increases
 					initiate();
 					x = System.currentTimeMillis();
 					continue;
@@ -50,7 +50,7 @@ public class NQueens {
 					if (k == q.y && coin == 1)
 						attacks[k] = Integer.MAX_VALUE; // do not pick the current location again
 					else
-						attacks[k] = getAttacks(q.x, k) - 1;
+						attacks[k] = getAttacks(q.x, k);
 				}
 
 				int minIndex = findMinIdx(attacks); // least conflicting cell to put a queen
@@ -65,12 +65,13 @@ public class NQueens {
 
 			}
 			double time = ((System.currentTimeMillis() - y) / 1000.0);
-			System.out.print(time + " secs!\t");
+			System.out.print(time + " secs!\n");
 			sum = sum + time;
 			tries++;
 		}
 
 		System.out.println("\nAverage of "+TRIALS+" runs: " + sum / tries);
+		//printBoard();
 
 	}
 
@@ -85,10 +86,11 @@ public class NQueens {
 
 	private static void initiate() {
 
-		// for(Queen q : Q)
-		// board[q.x][q.y] = false;
+		//		for(Queen q : Q)
+		//			board[q.x][q.y] = false;
 
-		// Q.clear();
+		board = new boolean[N][N];
+
 		// clear the list, if it is not cleared (used in flush)
 		Q = new ArrayList<>();
 
@@ -96,7 +98,7 @@ public class NQueens {
 
 		// A queen is put on a random row
 		int k = N - 1;
-		while (k > 0) {
+		while (k >= 0) {
 			putQueen(ints[k]);
 			k--;
 		}
@@ -124,7 +126,7 @@ public class NQueens {
 
 	private static int getAttacksDia(int i, int j) {
 		return attacksRightUpperDia(i - 1, j + 1) + attacksLeftUpperDia(i - 1, j - 1)
-				+ attacksRightLowerDia(i + 1, j + 1) + attacksLeftLowerDia(i + 1, j - 1);
+		+ attacksRightLowerDia(i + 1, j + 1) + attacksLeftLowerDia(i + 1, j - 1);
 
 	}
 
@@ -178,15 +180,20 @@ public class NQueens {
 	private static void putQueen(int i) {
 		// places a queen on the least conflicting column, in the row i
 
-		int[] attacks = new int[N];
-		for (int k = 0; k < N; k++)
-			attacks[k] = getAttacks(i, k);
+		int randomNum = ThreadLocalRandom.current().nextInt(0, N); // pick a random number as column index
 
-		int minIndex = findMinIdx(attacks); // index of least conflicting column
-		Queen q = new Queen(i, minIndex, getAttacks(i, minIndex)); // object carries useful info about a queen
+		//		We should not do this!
+
+		//int[] attacks = new int[N];
+		//for (int k = 0; k < N; k++)
+		//attacks[k] = getAttacks(i, k);
+		//int minIndex = findMinIdx(attacks); // index of least conflicting column
+		//randomNum = minIndex;
+
+		Queen q = new Queen(i, randomNum, getAttacks(i, randomNum)); // object carries useful info about a queen
 		Q.add(q); // put it on a list
 
-		board[i][minIndex] = true; // update the board
+		board[i][randomNum] = true; // update the board
 
 		// update others, the location may attack others
 		for (Queen queen : Q)
