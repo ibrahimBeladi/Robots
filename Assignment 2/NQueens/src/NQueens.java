@@ -1,18 +1,12 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	static int N = 1000;
+	static int N = 5;
 	static ArrayList<Queen> Q = new ArrayList<>();
-	static char[][] board = new char[N][N];
+	static boolean[][] board = new boolean[N][N];
 	
 	public static void main(String[] args) throws InterruptedException {
 		
@@ -48,7 +42,7 @@ public class NQueens {
 				Queen q = list.get(randomNum);
 	
 				// move it
-				board[q.x][q.y] = '\u0000'; // free current position
+				board[q.x][q.y] = false; // free current position
 				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
 				for(int k = 0; k < N; k++) {
 					if (k == q.y && coin == 1)
@@ -60,7 +54,7 @@ public class NQueens {
 				int minIndex = findMinIdx(attacks); // least conflicting cell to put a queen
 				
 				// update the board
-				board[q.x][minIndex] = 'Q';
+				board[q.x][minIndex] = true;
 				q.y = minIndex;
 
 				// update others, the location may attack others
@@ -69,7 +63,7 @@ public class NQueens {
 				
 			}
 			double time = ((System.currentTimeMillis() - y)/1000.0);
-			System.out.println("Finished in: " + time + " secs!");
+			System.out.println("Finished "+N+"*"+N+" in: " + time + " secs!");
 			sum = sum + time;
 			tries++;
 		}
@@ -89,10 +83,11 @@ public class NQueens {
 
 	private static void initiate() {
 		
-		for(Queen q : Q)
-			board[q.x][q.y] = '\u0000';
+//		for(Queen q : Q)
+//			board[q.x][q.y] = false;
 		
-		Q.clear(); // clear the list, if it is not cleared (used in flush)
+//		Q.clear(); // clear the list, if it is not cleared (used in flush)
+		Q = new ArrayList<>();
 		
 		int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
 		
@@ -111,12 +106,12 @@ public class NQueens {
 		
 		// attacks within row
 		for(int k = 0; k < N; k++)
-			if(board[i][k] == ('Q') && k != j)
+			if(board[i][k] && k != j)
 				attacks++;
 		
 		// attacks within column
 		for(int k = 0; k < N; k++)
-			if(board[k][j] == ('Q') && k != i)
+			if(board[k][j] && k != i)
 				attacks++;
 		
 		attacks = attacks + getAttacksDia(i, j);
@@ -133,10 +128,10 @@ public class NQueens {
 	}
 
 	private static int attacksLeftLowerDia(int i, int j) {
-		if (i < 0 || j < 0 || i == N || j == N)
+		if (j < 0 || i == N)
 			return 0;
 
-		if(board[i][j] == ('Q'))
+		if(board[i][j])
 			return 1 + attacksLeftLowerDia(i+1, j-1);
 		
 		else
@@ -144,10 +139,10 @@ public class NQueens {
 	}
 
 	private static int attacksRightLowerDia(int i, int j) {
-		if (i < 0 || j < 0 || i == N || j == N)
+		if (i == N || j == N)
 			return 0;
 
-		if(board[i][j] == ('Q'))
+		if(board[i][j])
 			return 1 + attacksRightLowerDia(i+1, j+1);
 		
 		else
@@ -155,10 +150,10 @@ public class NQueens {
 	}
 
 	private static int attacksLeftUpperDia(int i, int j) {
-		if (i < 0 || j < 0 || i == N || j == N)
+		if (i < 0 || j < 0)
 			return 0;
 
-		if(board[i][j] == 'Q')
+		if(board[i][j])
 			return 1 + attacksLeftUpperDia(i-1, j-1);
 		
 		else
@@ -166,10 +161,10 @@ public class NQueens {
 	}
 
 	private static int attacksRightUpperDia(int i, int j) {
-		if (i < 0 || j < 0 || i == N || j == N)
+		if (i < 0 || j == N)
 			return 0;
 
-		if(board[i][j] == 'Q')
+		if(board[i][j])
 			return 1 + attacksRightUpperDia(i-1, j+1);
 		
 		else
@@ -181,7 +176,7 @@ public class NQueens {
 	private static void printBoard() {
 		for(int i = 0; i < N; i++) {
 			for(int j = 0; j < N; j++) {
-				if(board[i][j] == 'Q')
+				if(board[i][j])
 					System.out.printf(board[i][j] + "[" + getAttacks(i, j) + "]\t");
 				else
 					System.out.printf("[" + getAttacks(i, j) + "]\t");
@@ -204,7 +199,7 @@ public class NQueens {
 		Queen q = new Queen(i, minIndex, getAttacks(i, minIndex)); // object carries useful info about a queen
 		Q.add(q); // put it on a list
 		
-		board[i][minIndex] = 'Q'; // update the board
+		board[i][minIndex] = true; // update the board
 		
 		// update others, the location may attack others
 		for(Queen queen : Q)
