@@ -4,221 +4,209 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	static int N = 5;
+	final static int TRIALS = 10;
+	final static int N = 1000;
 	static ArrayList<Queen> Q = new ArrayList<>();
 	static boolean[][] board = new boolean[N][N];
-	
+
 	public static void main(String[] args) throws InterruptedException {
-		
+
+		System.out.println("The board is " + N + "*" + N);
 		int tries = 0;
 		double sum = 0.0;
-		
-		while(tries < 10) {
-			
+
+		while (tries < TRIALS) {
+
 			long y = System.currentTimeMillis();
-			
+
 			// initiate the game
-			initiate();		
-			
+			initiate();
+
 			long x = System.currentTimeMillis();
-			
-			while(thereAreConflicts()) {
-				
+
+			while (thereAreConflicts()) {
+
 				// flush after a certain amount of time
-				if((System.currentTimeMillis() - x)/1000.0 > N/100.0) {					
-					initiate();				
+				if ((System.currentTimeMillis() - x) / 1000.0 > N / 100.0) {
+					initiate();
 					x = System.currentTimeMillis();
 					continue;
 				}
-				
+
 				// pick any conflicting queen
 				ArrayList<Queen> list = new ArrayList<>(); // contains list of conflicting queens
-				for(Queen q : Q)
-					if(q.conflicts != 0)
+				for (Queen q : Q)
+					if (q.conflicts != 0)
 						list.add(q);
-				
+
 				int randomNum = ThreadLocalRandom.current().nextInt(0, list.size()); // pick a random conflicting queen
 				int coin = ThreadLocalRandom.current().nextInt(0, 2); // increase randomness, decides to pick the current location again
 				Queen q = list.get(randomNum);
-	
+
 				// move it
 				board[q.x][q.y] = false; // free current position
 				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
-				for(int k = 0; k < N; k++) {
+				for (int k = 0; k < N; k++) {
 					if (k == q.y && coin == 1)
 						attacks[k] = Integer.MAX_VALUE; // do not pick the current location again
 					else
-						attacks[k] = getAttacks(q.x, k)-1;
-					}
-				
+						attacks[k] = getAttacks(q.x, k) - 1;
+				}
+
 				int minIndex = findMinIdx(attacks); // least conflicting cell to put a queen
-				
+
 				// update the board
 				board[q.x][minIndex] = true;
 				q.y = minIndex;
 
 				// update others, the location may attack others
-				for(Queen queen : Q)
+				for (Queen queen : Q)
 					queen.conflicts = getAttacks(queen.x, queen.y);
-				
+
 			}
-			double time = ((System.currentTimeMillis() - y)/1000.0);
-			System.out.println("Finished "+N+"*"+N+" in: " + time + " secs!");
+			double time = ((System.currentTimeMillis() - y) / 1000.0);
+			System.out.print(time + " secs!\t");
 			sum = sum + time;
 			tries++;
 		}
-		
-		System.out.println("Average: " + sum/tries);
-		
+
+		System.out.println("\nAverage of "+TRIALS+" runs: " + sum / tries);
+
 	}
-	
+
 	private static boolean thereAreConflicts() {
 		// return false if there are no conflicts
-		for(Queen q : Q)
-			if(q.conflicts != 0)
+		for (Queen q : Q)
+			if (q.conflicts != 0)
 				return true;
-		
+
 		return false;
 	}
 
 	private static void initiate() {
-		
-//		for(Queen q : Q)
-//			board[q.x][q.y] = false;
-		
-//		Q.clear(); // clear the list, if it is not cleared (used in flush)
+
+		// for(Queen q : Q)
+		// board[q.x][q.y] = false;
+
+		// Q.clear();
+		// clear the list, if it is not cleared (used in flush)
 		Q = new ArrayList<>();
-		
+
 		int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
-		
+
 		// A queen is put on a random row
-		int k = N-1;
-		while(k > 0) {
+		int k = N - 1;
+		while (k > 0) {
 			putQueen(ints[k]);
 			k--;
 		}
 	}
-	
-	private static int getAttacks(int i, int j) {	
+
+	private static int getAttacks(int i, int j) {
 		// returns how many attacks are on a given cell (i, j)
-		
+
 		int attacks = 0;
-		
+
 		// attacks within row
-		for(int k = 0; k < N; k++)
-			if(board[i][k] && k != j)
+		for (int k = 0; k < N; k++)
+			if (board[i][k] && k != j)
 				attacks++;
-		
+
 		// attacks within column
-		for(int k = 0; k < N; k++)
-			if(board[k][j] && k != i)
+		for (int k = 0; k < N; k++)
+			if (board[k][j] && k != i)
 				attacks++;
-		
+
 		attacks = attacks + getAttacksDia(i, j);
-		
+
 		return attacks;
 	}
 
 	private static int getAttacksDia(int i, int j) {
-		return attacksRightUpperDia(i-1, j+1)
-				+ attacksLeftUpperDia(i-1, j-1)
-				+ attacksRightLowerDia(i+1, j+1)
-				+ attacksLeftLowerDia(i+1, j-1);
-		
+		return attacksRightUpperDia(i - 1, j + 1) + attacksLeftUpperDia(i - 1, j - 1)
+				+ attacksRightLowerDia(i + 1, j + 1) + attacksLeftLowerDia(i + 1, j - 1);
+
 	}
 
 	private static int attacksLeftLowerDia(int i, int j) {
-		if (j < 0 || i == N)
-			return 0;
-
-		if(board[i][j])
-			return 1 + attacksLeftLowerDia(i+1, j-1);
-		
-		else
-			return attacksLeftLowerDia(i+1, j-1);
+		int s = 0;
+		for (; j >= 0 && i != N; i++, j--)
+			if (board[i][j])
+				s++;
+		return s;
 	}
 
 	private static int attacksRightLowerDia(int i, int j) {
-		if (i == N || j == N)
-			return 0;
-
-		if(board[i][j])
-			return 1 + attacksRightLowerDia(i+1, j+1);
-		
-		else
-			return attacksRightLowerDia(i+1, j+1);
+		int s = 0;
+		for (; i != N && j != N; i++, j++)
+			if (board[i][j])
+				s++;
+		return s;
 	}
 
 	private static int attacksLeftUpperDia(int i, int j) {
-		if (i < 0 || j < 0)
-			return 0;
-
-		if(board[i][j])
-			return 1 + attacksLeftUpperDia(i-1, j-1);
-		
-		else
-			return attacksLeftUpperDia(i-1, j-1);
+		int s = 0;
+		for (; i >= 0 && j >= 0; i--, j--)
+			if (board[i][j])
+				s++;
+		return s;
 	}
 
 	private static int attacksRightUpperDia(int i, int j) {
-		if (i < 0 || j == N)
-			return 0;
-
-		if(board[i][j])
-			return 1 + attacksRightUpperDia(i-1, j+1);
-		
-		else
-			return attacksRightUpperDia(i-1, j+1);
-		
+		int s = 0;
+		for (; i >= 0 && j != N; i--, j++)
+			if (board[i][j])
+				s++;
+		return s;
 	}
 
-
+	@SuppressWarnings("unused")
 	private static void printBoard() {
-		for(int i = 0; i < N; i++) {
-			for(int j = 0; j < N; j++) {
-				if(board[i][j])
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				if (board[i][j])
 					System.out.printf(board[i][j] + "[" + getAttacks(i, j) + "]\t");
 				else
 					System.out.printf("[" + getAttacks(i, j) + "]\t");
 			}
-			
+
 			System.out.println();
 		}
 		System.out.println("----------------------");
 	}
 
-
 	private static void putQueen(int i) {
 		// places a queen on the least conflicting column, in the row i
-		
+
 		int[] attacks = new int[N];
-		for(int k = 0; k < N; k++)
+		for (int k = 0; k < N; k++)
 			attacks[k] = getAttacks(i, k);
-		
+
 		int minIndex = findMinIdx(attacks); // index of least conflicting column
 		Queen q = new Queen(i, minIndex, getAttacks(i, minIndex)); // object carries useful info about a queen
 		Q.add(q); // put it on a list
-		
+
 		board[i][minIndex] = true; // update the board
-		
+
 		// update others, the location may attack others
-		for(Queen queen : Q)
+		for (Queen queen : Q)
 			queen.conflicts = getAttacks(queen.x, queen.y);
-		
+
 	}
-	
+
 	public static int findMinIdx(int[] numbers) {
-	    if (numbers == null || numbers.length == 0) return -1; // Saves time for empty array
-	    // As pointed out by ZouZou, you can save an iteration by assuming the first index is the smallest
-	    int minVal = numbers[0]; // Keeps a running count of the smallest value so far
-	    int minIdx = 0; // Will store the index of minVal
-	    for(int idx=1; idx<numbers.length; idx++) {
-	        if(numbers[idx] < minVal) {
-	            minVal = numbers[idx];
-	            minIdx = idx;
-	        }
-	    }
-	    return minIdx;
+		if (numbers == null || numbers.length == 0)
+			return -1; // Saves time for empty array
+		// As pointed out by ZouZou, you can save an iteration by assuming the first index is the smallest
+		int minVal = numbers[0]; // Keeps a running count of the smallest value so far
+		int minIdx = 0; // Will store the index of minVal
+		for (int idx = 1; idx < numbers.length; idx++) {
+			if (numbers[idx] < minVal) {
+				minVal = numbers[idx];
+				minIdx = idx;
+			}
+		}
+		return minIdx;
 	}
 
 }
