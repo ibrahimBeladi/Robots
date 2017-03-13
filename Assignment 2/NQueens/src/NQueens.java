@@ -3,25 +3,25 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
 
-	final static int TRIALS = 10;
-	final static int N = 1000;
-	/*
-	if you find a better number listed here
-	you can also use new values for n=50,150,250,500,750...
-	n			t2f
-	1			0.0001
-	10			0.00635
-	100			0.5
-	1000		22.13594362
-
-	 */
-	static double timeToFlush =  ((0.00005178-0.00000003*N)*N + 0.00011936)*N; // this value should be tuned manually (time to re-initiate), should increase as N increases
-	static ArrayList<Queen> Q = new ArrayList<>();
-	static boolean[][] board = new boolean[N][N];
-	
+	static int N;
+	static ArrayList<Queen> Q;
+	static boolean[][] board;
+	static int TRIALS;
+	static double timeToFlush; 
 	public static void main(String[] args) throws InterruptedException {
+		TRIALS = 10;
+		N = 650;
+		// this value should be tuned manually (time to re-initiate), should increase as N increases
+		timeToFlush =  N;
+		timeToFlush *= 1000;//sec to msec 
+		Q = new ArrayList<>();
+		board = new boolean[N][N];
+		solve();		
+		
+	}
+
+	private static double solve() {
 		int timeouts = 0;
-		System.out.println("The board is " + N + "*" + N);
 		int tries = 0;
 		double sum = 0.0;
 
@@ -35,12 +35,12 @@ public class NQueens {
 			long x = System.currentTimeMillis();
 			while (thereAreConflicts()) {
 
-				// flush after a certain amount of time
-				if ((System.currentTimeMillis() - x) / 1000.0 > timeToFlush) {
+				// flush if it took to much time
+				if (System.currentTimeMillis()  > timeToFlush + x) {
 					initiate();
 					x = System.currentTimeMillis();
 					timeouts++;
-//					continue;
+					System.out.println("Timeout !");
 				}
 
 				// pick any conflicting queen
@@ -49,8 +49,8 @@ public class NQueens {
 					if (q.conflicts != 0)
 						list.add(q);
 
-				int randomNum = ThreadLocalRandom.current().nextInt(0, list.size()); // pick a random conflicting queen
-				Queen q = list.get(randomNum);
+
+				Queen q = getRandomQueen(list);// pick a random conflicting queen
 
 				// move it
 				board[q.x][q.y] = false; // free current position
@@ -67,17 +67,15 @@ public class NQueens {
 					if(attacks[k] == minValue)
 						equalMin.add(k);
 
-				int randomIdx = ThreadLocalRandom.current().nextInt(0, equalMin.size()); // pick a random conflicting queen
-				int finalIdx = equalMin.get(randomIdx);
 				
-				// update the board
-				board[q.x][finalIdx] = true;
-				q.y = minIndex;
+				// insert a random conflicting queen
+				int r = getRandomMin(equalMin);
+				board[q.x][r] = true;
+				q.y = r;
 
 				// update others, the location may attack others
 				for (Queen queen : Q)
 					queen.conflicts = getAttacks(queen.x, queen.y);
-
 			}
 			double time = ((System.currentTimeMillis() - y) / 1000.0);
 			System.out.print(time + " secs!\n");
@@ -85,11 +83,20 @@ public class NQueens {
 			tries++;
 			//printBoard();
 		}
+//		printBoard();
+		double average = sum / tries;
+		System.out.println("The board = " + N + "*" + N);
+		System.out.println("Average of "+TRIALS+" runs: " + average);
+		System.out.println("Timeouts = "+timeouts);
+		return average;
+	}
 
-		System.out.println("\nAverage of "+TRIALS+" runs: " + sum / tries);
-		System.out.println("timeouts = "+timeouts);
-		//printBoard();
+	private static Integer getRandomMin(ArrayList<Integer> equalMin) {
+		return equalMin.get(ThreadLocalRandom.current().nextInt(0, equalMin.size()));
+	}
 
+	private static Queen getRandomQueen(ArrayList<Queen> list) {
+		return list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
 	}
 
 	private static boolean thereAreConflicts() {
@@ -97,28 +104,17 @@ public class NQueens {
 		for (Queen q : Q)
 			if (q.conflicts != 0)
 				return true;
-
 		return false;
 	}
 
 	private static void initiate() {
-
-		//		for(Queen q : Q)
-		//			board[q.x][q.y] = false;
-
 		board = new boolean[N][N];
-
-		// clear the list, if it is not cleared (used in flush)
 		Q = new ArrayList<>();
-
-		//int[] ints = new Random().ints(0, N).distinct().limit(N).toArray(); // distinct random numbers between 0 and N-1. The rows
 
 		// A queen is put on a random row
 		int k = N - 1;
-		while (k >= 0) {
-			putQueen(k);
-			k--;
-		}
+		while (k >= 0)
+			putQueen(k--);
 	}
 
 	private static int getAttacks(int i, int j) {
@@ -126,7 +122,7 @@ public class NQueens {
 
 		int attacks = 0;
 
-//		 attacks within row
+		// attacks within row
 		for (int k = 0; k < N; k++)
 			if (board[i][k] && k != j)
 				attacks++;
@@ -184,7 +180,7 @@ public class NQueens {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
 				if (board[i][j])
-					System.out.printf(board[i][j] + "[" + getAttacks(i, j) + "]\t");
+					System.out.printf(" Q \t");
 				else
 					System.out.printf("[" + getAttacks(i, j) + "]\t");
 			}
@@ -198,15 +194,12 @@ public class NQueens {
 		// places a queen on the least conflicting column, in the row i
 
 		int randomNum = ThreadLocalRandom.current().nextInt(0, N); // pick a random number as column index
-
 		Queen q = new Queen(i, randomNum, getAttacks(i, randomNum)); // object carries useful info about a queen
 		Q.add(q); // put it on a list
-
 		board[i][randomNum] = true; // update the board
-
 		// update others, the location may attack others
-		for (Queen queen : Q)
-			queen.conflicts = getAttacks(queen.x, queen.y);
+//		for (Queen queen : Q)
+//			queen.conflicts = getAttacks(queen.x, queen.y);
 
 	}
 
