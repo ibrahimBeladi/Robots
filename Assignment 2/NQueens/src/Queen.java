@@ -2,7 +2,7 @@
 public class Queen {
 	public int x;
 	public int y;
-	public int conflicts;
+	public Integer conflicts;
 	
 	public Queen(int x, int y, int conflicts) {
 		this.x = x;

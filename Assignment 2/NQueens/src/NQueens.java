@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NQueens {
@@ -10,10 +12,10 @@ public class NQueens {
 	static double timeToFlush; 
 	public static void main(String[] args) throws InterruptedException {
 		TRIALS = 10;
-		N = 650;
+		N = 1000;
 		// this value should be tuned manually (time to re-initiate), should increase as N increases
 		timeToFlush =  N;
-		timeToFlush *= 1000;//sec to msec 
+		timeToFlush *= 1000; //sec to msec 
 		Q = new ArrayList<>();
 		board = new boolean[N][N];
 		solve();		
@@ -50,7 +52,7 @@ public class NQueens {
 						list.add(q);
 
 
-				Queen q = getRandomQueen(list);// pick a random conflicting queen
+				Queen q = getMaxRandomQueen(list);// pick a random conflicting queen
 
 				// move it
 				board[q.x][q.y] = false; // free current position
@@ -81,9 +83,8 @@ public class NQueens {
 			System.out.print(time + " secs!\n");
 			sum = sum + time;
 			tries++;
-			//printBoard();
 		}
-//		printBoard();
+		
 		double average = sum / tries;
 		System.out.println("The board = " + N + "*" + N);
 		System.out.println("Average of "+TRIALS+" runs: " + average);
@@ -95,8 +96,21 @@ public class NQueens {
 		return equalMin.get(ThreadLocalRandom.current().nextInt(0, equalMin.size()));
 	}
 
-	private static Queen getRandomQueen(ArrayList<Queen> list) {
-		return list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
+	private static Queen getMaxRandomQueen(ArrayList<Queen> list) {
+		ArrayList<Queen> randomQueens = new ArrayList<>();
+		int numberOfRandomQueens = 50; 
+		for(int i = 0; i < numberOfRandomQueens; i++)
+			randomQueens.add(list.get(ThreadLocalRandom.current().nextInt(0, list.size())));
+		
+		// pick the max in terms of # of conflicts
+		Queen maxRandom = Collections.max(randomQueens, new Comparator<Queen>() {
+			@Override
+			public int compare(Queen o1, Queen o2) {
+				return o1.conflicts - o2.conflicts;
+			}
+		});
+		
+		return maxRandom;
 	}
 
 	private static boolean thereAreConflicts() {
@@ -197,10 +211,6 @@ public class NQueens {
 		Queen q = new Queen(i, randomNum, getAttacks(i, randomNum)); // object carries useful info about a queen
 		Q.add(q); // put it on a list
 		board[i][randomNum] = true; // update the board
-		// update others, the location may attack others
-//		for (Queen queen : Q)
-//			queen.conflicts = getAttacks(queen.x, queen.y);
-
 	}
 
 	public static int findMinIdx(int[] numbers) {
