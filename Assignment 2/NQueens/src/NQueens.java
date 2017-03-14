@@ -12,9 +12,17 @@ public class NQueens {
 	static double timeToFlush; 
 	public static void main(String[] args) throws InterruptedException {
 		TRIALS = 10;
-		N = 1000;
-		// this value should be tuned manually (time to re-initiate), should increase as N increases
-		timeToFlush =  N;
+		N = 10;
+		
+		if (N > 750)
+			timeToFlush =  N;
+		else if (N > 500)
+			timeToFlush =  2.5;
+		else if (N > 100)
+			timeToFlush =  0.5;
+		else
+			timeToFlush = 0.01;
+		
 		timeToFlush *= 1000; //sec to msec 
 		Q = new ArrayList<>();
 		board = new boolean[N][N];
@@ -78,6 +86,8 @@ public class NQueens {
 				// update others, the location may attack others
 				for (Queen queen : Q)
 					queen.conflicts = getAttacks(queen.x, queen.y);
+				
+				printBoard();
 			}
 			double time = ((System.currentTimeMillis() - y) / 1000.0);
 			System.out.print(time + " secs!\n");
@@ -98,7 +108,7 @@ public class NQueens {
 
 	private static Queen getMaxRandomQueen(ArrayList<Queen> list) {
 		ArrayList<Queen> randomQueens = new ArrayList<>();
-		int numberOfRandomQueens = 50; 
+		int numberOfRandomQueens = 100; 
 		for(int i = 0; i < numberOfRandomQueens; i++)
 			randomQueens.add(list.get(ThreadLocalRandom.current().nextInt(0, list.size())));
 		
@@ -135,11 +145,6 @@ public class NQueens {
 		// returns how many attacks are on a given cell (i, j)
 
 		int attacks = 0;
-
-		// attacks within row
-		for (int k = 0; k < N; k++)
-			if (board[i][k] && k != j)
-				attacks++;
 
 		// attacks within column
 		for (int k = 0; k < N; k++)
@@ -194,7 +199,7 @@ public class NQueens {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
 				if (board[i][j])
-					System.out.printf(" Q \t");
+					System.out.printf(" Q[" + getAttacks(i, j) + "]\t");
 				else
 					System.out.printf("[" + getAttacks(i, j) + "]\t");
 			}
