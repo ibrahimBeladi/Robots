@@ -220,10 +220,10 @@ public class NQueens {
 
 	public static int findMinIdx(int[] numbers) {
 		if (numbers == null || numbers.length == 0)
-			return -1; // Saves time for empty array
-		// As pointed out by ZouZou, you can save an iteration by assuming the first index is the smallest
-		int minVal = numbers[0]; // Keeps a running count of the smallest value so far
-		int minIdx = 0; // Will store the index of minVal
+			return -1; 
+		
+		int minVal = numbers[0]; 
+		int minIdx = 0; 
 		for (int idx = 1; idx < numbers.length; idx++) {
 			if (numbers[idx] < minVal) {
 				minVal = numbers[idx];
