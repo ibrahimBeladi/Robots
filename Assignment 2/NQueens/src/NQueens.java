@@ -16,7 +16,7 @@ public class NQueens {
 		
 		if (N > 750)
 			timeToFlush =  N;
-		else if (N > 500)
+		else if (N >= 500)
 			timeToFlush =  2.5;
 		else if (N > 100)
 			timeToFlush =  0.5;
