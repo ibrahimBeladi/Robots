@@ -24,14 +24,13 @@ public class NQueens {
 			timeToFlush = 0.01;
 		
 		timeToFlush *= 1000; //sec to msec 
-		Q = new ArrayList<>();
+		Q = new ArrayList<Queen>();
 		board = new boolean[N][N];
 		solve();		
-		
 	}
 
-	private static double solve() {
-		int timeouts = 0;
+	private static void solve() {
+//		int timeouts = 0;
 		int tries = 0;
 		double sum = 0.0;
 
@@ -49,18 +48,18 @@ public class NQueens {
 				if (System.currentTimeMillis()  > timeToFlush + x) {
 					initiate();
 					x = System.currentTimeMillis();
-					timeouts++;
-					System.out.println("Timeout !");
+//					timeouts++;
+//					System.out.println("Timeout !");
 				}
 
 				// pick any conflicting queen
-				ArrayList<Queen> list = new ArrayList<>(); // contains list of conflicting queens
+				ArrayList<Queen> conflictingQueens = new ArrayList<Queen>(); // contains list of conflicting queens
 				for (Queen q : Q)
 					if (q.conflicts != 0)
-						list.add(q);
+						conflictingQueens.add(q);
 
 
-				Queen q = getMaxRandomQueen(list);// pick a random conflicting queen
+				Queen q = getRandomMaxQueen(conflictingQueens);// pick a random conflicting queen
 
 				// move it
 				board[q.x][q.y] = false; // free current position
@@ -75,7 +74,7 @@ public class NQueens {
 				// pick one of the least conflicting cells
 				int minIndex = findMinIdx(attacks); 
 				int minValue = attacks[minIndex];
-				ArrayList<Integer> equalMin = new ArrayList<>();
+				ArrayList<Integer> equalMin = new ArrayList<Integer>();
 				for(int k = 0; k < attacks.length; k++)
 					if(attacks[k] == minValue)
 						equalMin.add(k);
@@ -93,20 +92,18 @@ public class NQueens {
 			System.out.print(time + " secs!\n");
 			sum = sum + time;
 			tries++;
-			
-			
 		}
-		
 		double average = sum / tries;
 		System.out.println("The board = " + N + "*" + N);
 		System.out.println("Average of "+TRIALS+" runs: " + average);
-		System.out.println("Timeouts = "+timeouts);
-		return average;
+//		System.out.println("Timeouts = "+timeouts);
 	}
 
 	private static void updateAffectedBy(Queen q2, int i) {
+		int d = q2.x - q2.y;
+		int s = q2.x + q2.y;
 		for(Queen q : Q)
-			if((q.y == q2.y) || ((q.x - q.y) == (q2.x - q2.y)) || ((q.x + q.y) == (q2.x + q2.y)))
+			if((q.y == q2.y) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
 				q.conflicts += i;
 		
 	}
@@ -115,8 +112,8 @@ public class NQueens {
 		return equalMin.get(ThreadLocalRandom.current().nextInt(0, equalMin.size()));
 	}
 
-	private static Queen getMaxRandomQueen(ArrayList<Queen> list) {
-		ArrayList<Queen> randomQueens = new ArrayList<>();
+	private static Queen getRandomMaxQueen(ArrayList<Queen> list) {
+		ArrayList<Queen> randomQueens = new ArrayList<Queen>();
 		int numberOfRandomQueens = 100; 
 		for(int i = 0; i < numberOfRandomQueens; i++)
 			randomQueens.add(list.get(ThreadLocalRandom.current().nextInt(0, list.size())));
@@ -142,7 +139,7 @@ public class NQueens {
 
 	private static void initiate() {
 		board = new boolean[N][N];
-		Q = new ArrayList<>();
+		Q = new ArrayList<Queen>();
 
 		// A queen is put on a random row
 		int k = N - 1;
@@ -158,14 +155,16 @@ public class NQueens {
 		// returns how many attacks are on a given cell (i, j)
 
 		int attacks = 0;
-
-		for(Queen q : Q)
-			if((q.y == j) || ((q.x - q.y) == (i - j)) || ((q.x + q.y) == (i + j)))
+		int d = i - j;
+		int s = i + j;
+		for(Queen q : Q) 
+			if((q.y == j) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
 				attacks++;
 	
 		return attacks;
 	}
 
+	@SuppressWarnings("unused")
 	private static void printBoard() {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
