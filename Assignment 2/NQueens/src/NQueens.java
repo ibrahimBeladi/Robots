@@ -12,7 +12,7 @@ public class NQueens {
 	static double timeToFlush; 
 	public static void main(String[] args) throws InterruptedException {
 		TRIALS = 10;
-		N = 10;
+		N = 1000;
 		
 		if (N > 750)
 			timeToFlush =  N;
@@ -44,7 +44,7 @@ public class NQueens {
 
 			long x = System.currentTimeMillis();
 			while (thereAreConflicts()) {
-
+				
 				// flush if it took to much time
 				if (System.currentTimeMillis()  > timeToFlush + x) {
 					initiate();
@@ -64,10 +64,13 @@ public class NQueens {
 
 				// move it
 				board[q.x][q.y] = false; // free current position
+				Q.remove(q); // remove it so that it is not affected by itself, also reduce # of comparisons
+				updateAffectedBy(q, -1); // update ONLY affected queens after removing
 				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
 				for (int k = 0; k < N; k++) {
 					attacks[k] = getAttacks(q.x, k);
 				}
+				
 				
 				// pick one of the least conflicting cells
 				int minIndex = findMinIdx(attacks); 
@@ -82,17 +85,16 @@ public class NQueens {
 				int r = getRandomMin(equalMin);
 				board[q.x][r] = true;
 				q.y = r;
-
-				// update others, the location may attack others
-				for (Queen queen : Q)
-					queen.conflicts = getAttacks(queen.x, queen.y);
-				
-				printBoard();
+				q.conflicts = minValue;
+				updateAffectedBy(q, 1); // update ONLY affected queens after inserting
+				Q.add(q);
 			}
 			double time = ((System.currentTimeMillis() - y) / 1000.0);
 			System.out.print(time + " secs!\n");
 			sum = sum + time;
 			tries++;
+			
+			
 		}
 		
 		double average = sum / tries;
@@ -100,6 +102,13 @@ public class NQueens {
 		System.out.println("Average of "+TRIALS+" runs: " + average);
 		System.out.println("Timeouts = "+timeouts);
 		return average;
+	}
+
+	private static void updateAffectedBy(Queen q2, int i) {
+		for(Queen q : Q)
+			if((q.y == q2.y) || ((q.x - q.y) == (q2.x - q2.y)) || ((q.x + q.y) == (q2.x + q2.y)))
+				q.conflicts += i;
+		
 	}
 
 	private static Integer getRandomMin(ArrayList<Integer> equalMin) {
@@ -139,6 +148,10 @@ public class NQueens {
 		int k = N - 1;
 		while (k >= 0)
 			putQueen(k--);
+		
+		// conflicts must be updated from here
+		for (Queen queen : Q)
+			queen.conflicts = getAttacks(queen.x, queen.y);
 	}
 
 	private static int getAttacks(int i, int j) {
@@ -146,55 +159,13 @@ public class NQueens {
 
 		int attacks = 0;
 
-		// attacks within column
-		for (int k = 0; k < N; k++)
-			if (board[k][j] && k != i)
+		for(Queen q : Q)
+			if((q.y == j) || ((q.x - q.y) == (i - j)) || ((q.x + q.y) == (i + j)))
 				attacks++;
-
-		attacks = attacks + getAttacksDia(i, j);
-
+	
 		return attacks;
 	}
 
-	private static int getAttacksDia(int i, int j) {
-		return attacksRightUpperDia(i - 1, j + 1) + attacksLeftUpperDia(i - 1, j - 1)
-		+ attacksRightLowerDia(i + 1, j + 1) + attacksLeftLowerDia(i + 1, j - 1);
-
-	}
-
-	private static int attacksLeftLowerDia(int i, int j) {
-		int s = 0;
-		for (; j >= 0 && i != N; i++, j--)
-			if (board[i][j])
-				s++;
-		return s;
-	}
-
-	private static int attacksRightLowerDia(int i, int j) {
-		int s = 0;
-		for (; i != N && j != N; i++, j++)
-			if (board[i][j])
-				s++;
-		return s;
-	}
-
-	private static int attacksLeftUpperDia(int i, int j) {
-		int s = 0;
-		for (; i >= 0 && j >= 0; i--, j--)
-			if (board[i][j])
-				s++;
-		return s;
-	}
-
-	private static int attacksRightUpperDia(int i, int j) {
-		int s = 0;
-		for (; i >= 0 && j != N; i--, j++)
-			if (board[i][j])
-				s++;
-		return s;
-	}
-
-	@SuppressWarnings("unused")
 	private static void printBoard() {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
@@ -213,9 +184,10 @@ public class NQueens {
 		// places a queen on the least conflicting column, in the row i
 
 		int randomNum = ThreadLocalRandom.current().nextInt(0, N); // pick a random number as column index
-		Queen q = new Queen(i, randomNum, getAttacks(i, randomNum)); // object carries useful info about a queen
+		Queen q = new Queen(i, randomNum, 1); // object carries useful info about a queen, no need to update from here
 		Q.add(q); // put it on a list
 		board[i][randomNum] = true; // update the board
+
 	}
 
 	public static int findMinIdx(int[] numbers) {
