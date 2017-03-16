@@ -12,7 +12,7 @@ public class NQueens {
 	static double timeToFlush; 
 	public static void main(String[] args) throws InterruptedException {
 		TRIALS = 10;
-		N = 1000;
+		N = 10000;
 		
 		if (N > 750)
 			timeToFlush =  N;
@@ -30,7 +30,6 @@ public class NQueens {
 	}
 
 	private static void solve() {
-//		int timeouts = 0;
 		int tries = 0;
 		double sum = 0.0;
 
@@ -48,8 +47,6 @@ public class NQueens {
 				if (System.currentTimeMillis()  > timeToFlush + x) {
 					initiate();
 					x = System.currentTimeMillis();
-//					timeouts++;
-//					System.out.println("Timeout !");
 				}
 
 				// pick any conflicting queen
@@ -88,15 +85,16 @@ public class NQueens {
 				updateAffectedBy(q, 1); // update ONLY affected queens after inserting
 				Q.add(q);
 			}
+			//printBoard();
 			double time = ((System.currentTimeMillis() - y) / 1000.0);
 			System.out.print(time + " secs!\n");
 			sum = sum + time;
 			tries++;
 		}
+		
 		double average = sum / tries;
 		System.out.println("The board = " + N + "*" + N);
 		System.out.println("Average of "+TRIALS+" runs: " + average);
-//		System.out.println("Timeouts = "+timeouts);
 	}
 
 	private static void updateAffectedBy(Queen q2, int i) {
@@ -132,7 +130,7 @@ public class NQueens {
 	private static boolean thereAreConflicts() {
 		// return false if there are no conflicts
 		for (Queen q : Q)
-			if (q.conflicts != 0)
+			if (q.conflicts > 0)
 				return true;
 		return false;
 	}
@@ -149,6 +147,7 @@ public class NQueens {
 		// conflicts must be updated from here
 		for (Queen queen : Q)
 			queen.conflicts = getAttacks(queen.x, queen.y);
+		
 	}
 
 	private static int getAttacks(int i, int j) {
@@ -157,9 +156,12 @@ public class NQueens {
 		int attacks = 0;
 		int d = i - j;
 		int s = i + j;
-		for(Queen q : Q) 
+		for(Queen q : Q) {
+			if(i == q.x && j == q.y)
+				continue;
 			if((q.y == j) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
 				attacks++;
+		}
 	
 		return attacks;
 	}
