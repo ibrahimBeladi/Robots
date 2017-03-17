@@ -6,13 +6,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NQueens {
 
 	static int N;
-	static ArrayList<Queen> Q;
+	static Queen[] Q;
 	static boolean[][] board;
 	static int TRIALS;
 	static double timeToFlush; 
 	public static void main(String[] args) throws InterruptedException {
 		TRIALS = 10;
-		N = 10000;
+		N = 1000;
 		
 		if (N > 750)
 			timeToFlush =  N;
@@ -24,9 +24,8 @@ public class NQueens {
 			timeToFlush = 0.01;
 		
 		timeToFlush *= 1000; //sec to msec 
-		Q = new ArrayList<Queen>();
-		board = new boolean[N][N];
 		solve();		
+//		printBoard();
 	}
 
 	private static void solve() {
@@ -60,7 +59,7 @@ public class NQueens {
 
 				// move it
 				board[q.x][q.y] = false; // free current position
-				Q.remove(q); // remove it so that it is not affected by itself, also reduce # of comparisons
+				Q[q.x] = null; // remove it so that it is not affected by itself, also reduce # of comparisons
 				updateAffectedBy(q, -1); // update ONLY affected queens after removing
 				int attacks[] = new int[N]; // array of attacks in each cell in the queen's row
 				for (int k = 0; k < N; k++) {
@@ -83,9 +82,8 @@ public class NQueens {
 				q.y = r;
 				q.conflicts = minValue;
 				updateAffectedBy(q, 1); // update ONLY affected queens after inserting
-				Q.add(q);
+				Q[q.x]=q;
 			}
-			//printBoard();
 			double time = ((System.currentTimeMillis() - y) / 1000.0);
 			System.out.print(time + " secs!\n");
 			sum = sum + time;
@@ -101,8 +99,9 @@ public class NQueens {
 		int d = q2.x - q2.y;
 		int s = q2.x + q2.y;
 		for(Queen q : Q)
-			if((q.y == q2.y) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
-				q.conflicts += i;
+			if(q!=null)
+				if((q.y == q2.y) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
+					q.conflicts += i;
 		
 	}
 
@@ -137,7 +136,7 @@ public class NQueens {
 
 	private static void initiate() {
 		board = new boolean[N][N];
-		Q = new ArrayList<Queen>();
+		Q = new Queen[N];
 
 		// A queen is put on a random row
 		int k = N - 1;
@@ -157,10 +156,12 @@ public class NQueens {
 		int d = i - j;
 		int s = i + j;
 		for(Queen q : Q) {
-			if(i == q.x && j == q.y)
-				continue;
-			if((q.y == j) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
-				attacks++;
+			if(q!=null){
+				if(i == q.x && j == q.y)
+					continue;
+				if((q.y == j) || ((q.x - q.y) == d) || ((q.x + q.y) == s))
+					attacks++;
+			}
 		}
 	
 		return attacks;
@@ -171,7 +172,7 @@ public class NQueens {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
 				if (board[i][j])
-					System.out.printf(" Q[" + getAttacks(i, j) + "]\t");
+					System.out.printf(" Q \t");
 				else
 					System.out.printf("[" + getAttacks(i, j) + "]\t");
 			}
@@ -186,7 +187,7 @@ public class NQueens {
 
 		int randomNum = ThreadLocalRandom.current().nextInt(0, N); // pick a random number as column index
 		Queen q = new Queen(i, randomNum, 1); // object carries useful info about a queen, no need to update from here
-		Q.add(q); // put it on a list
+		Q[i]=q; // put it on a list
 		board[i][randomNum] = true; // update the board
 
 	}
