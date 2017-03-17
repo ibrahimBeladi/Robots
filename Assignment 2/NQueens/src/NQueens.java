@@ -176,10 +176,9 @@ public class NQueens {
 				else
 					System.out.printf("[" + getAttacks(i, j) + "]\t");
 			}
-
 			System.out.println();
 		}
-		System.out.println("----------------------");
+		System.out.print("----------------------");
 	}
 
 	private static void putQueen(int i) {
