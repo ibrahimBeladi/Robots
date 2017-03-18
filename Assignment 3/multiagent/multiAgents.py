@@ -74,7 +74,41 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        """
+        The startegy to find the evaluation function is as follows:
+        - find the distance to all food points in the grid.
+        - take the minimum and use as an evaluation point. "the minimum distace to a food point is desired"
+        - do the same thing with the ghosts positions. but TAKE THE MAXIMUM because pacman need to GET AWAY from ghosts
+        - take the length of the food list as another indicator. "as long as the list is minimal, we are close to our goal"
+        after that, give these functions some weights. "I played with the wights until I got useful ones"
+        """
+        # get food points as list
+        foodList = newFood.asList()
+
+        # calcualte distances to the successor's position
+        foodListD = []
+        for food in foodList:
+            foodListD.append(int(util.manhattanDistance(food, newPos)))
+
+        # get the minimum to the successor position
+        minDisToFood = 0  # INITIALIZATION
+        if len(foodListD) is not 0:
+            minDisToFood = min(foodListD)
+
+        # get ghost positions as list ' WE HAVE ONLY ONE GHOST IN THE LAYOUT "OPEN CLASSIC"
+        ghostsPositions = []
+        for ghost in newGhostStates:
+            ghostsPositions.append(ghost.getPosition())
+
+        # calculate the distance
+        ghostsPositionsD = []
+        for ghost in ghostsPositions:
+            ghostsPositionsD.append(manhattanDistance(ghost, newPos))
+
+        # get the minimum to successor position
+        distToGhost = min(ghostsPositionsD)
+
+        return -2 * minDisToFood - 37 * len(foodList) + 2 * distToGhost  # these numbers are controllers, you can play with them and see their effect on pacman behaviour.
 
 def scoreEvaluationFunction(currentGameState):
     """
