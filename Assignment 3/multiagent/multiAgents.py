@@ -85,7 +85,7 @@ class ReflexAgent(Agent):
         # get food points as list
         foodList = newFood.asList()
 
-        # calcualte distances to the successor's position
+        # calculate distances to the successor's position
         foodListD = []
         for food in foodList:
             foodListD.append(int(util.manhattanDistance(food, newPos)))
@@ -163,6 +163,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        
+        '''print gameState.getLegalActions(0)
+        print
+        print gameState.generateSuccessor(0, 'Right').getLegalActions()'''
+        
+        return ['Left']
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
