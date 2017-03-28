@@ -225,10 +225,89 @@ def betterEvaluationFunction(currentGameState):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION
+
+      used as parameters:
+        1. # of food pellets left
+        2. distance to the non-scared ghosts (manhattan)
+        3. distance to the scared ghosts (manhattan)
+        4. distance to the closest food pellet (manhattan)
+        5. distance to the closest power food pellet (manhattan)
+
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    pos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    ghostStates = currentGameState.getGhostStates()
+    currentScore = scoreEvaluationFunction(currentGameState)
+
+    if currentGameState.isLose():
+        return -float("inf")
+    elif currentGameState.isWin():
+        return float("inf")
+
+    food = food.asList()
+
+    foodPelletDistances = []
+    for i in food:
+        foodPelletDistances.append(util.manhattanDistance(pos, i))
+
+    closestFoodPellet = min(foodPelletDistances)
+
+    # number of power food pellets
+    powerFoodPellets = len(currentGameState.getCapsules())
+
+    # # distance to power food pellets
+    # powerFoodPelletsDistances = []
+    #
+    # for i in currentGameState.getCapsules():
+    #     powerFoodPelletsDistances.append(util.manhattanDistance(pos, i))
+    #
+    # if len(powerFoodPelletsDistances) > 0:
+    #     closestPowerFoodPellet = min(powerFoodPelletsDistances)
+    #
+    # else:
+    #     closestPowerFoodPellet = 0
+
+    # number of food pellets
+    foodPellets = len(food)
+
+    # ghost distance
+    scaredGhosts = []
+    nonScaredGhosts = []
+    for g in ghostStates:
+        if not g.scaredTimer:
+            nonScaredGhosts.append(g)
+        else:
+            scaredGhosts.append(g)
+
+
+    closestGhostDistanceNonScared = 0
+    nonScaredManhattanDistances = []
+    if nonScaredGhosts:
+        for i in ghostStates:
+            nonScaredManhattanDistances.append(util.manhattanDistance(pos, i.getPosition()))
+        closestGhostDistanceNonScared = min(nonScaredManhattanDistances)
+
+    else:
+        closestGhostDistanceNonScared = float("inf")
+
+    closestGhostDistanceNonScared = max(closestGhostDistanceNonScared, 5)
+
+
+    scaredManhattanDistances = []
+    closestGhostDistanceScared = 0
+    if scaredGhosts:
+        for i in ghostStates:
+            scaredManhattanDistances.append(util.manhattanDistance(pos, i.getPosition()))
+        closestGhostDistanceScared = min(scaredManhattanDistances)
+    else:
+        closestGhostDistanceScared = 0
+
+    score = currentScore + (-1 * closestFoodPellet) + (-2 * (1. / closestGhostDistanceNonScared)) + \
+            (-3 * closestGhostDistanceScared) + (-80 * powerFoodPellets) + (-4 * foodPellets)
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
