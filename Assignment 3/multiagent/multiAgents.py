@@ -229,12 +229,11 @@ def betterEvaluationFunction(currentGameState):
 
       used as parameters:
         1. # of food pellets left
-        2. distance to the non-scared ghosts (manhattan)
-        3. distance to the scared ghosts (manhattan)
-        4. distance to the closest food pellet (manhattan)
-        5. # of power food pellets left
+        2. distance to the scared ghosts (manhattan)
+        3. distance to the closest food pellet (manhattan)
+        4. # of power food pellets left
 	
-	The highest weight is given to (5), since eating the power food pellet and eating the ghost will improve the score
+	The highest weight is given to (4), since eating the power food pellet and eating the ghost will improve the score
 
     """
 
@@ -259,43 +258,14 @@ def betterEvaluationFunction(currentGameState):
     # number of power food pellets
     powerFoodPellets = len(currentGameState.getCapsules())
 
-    # # distance to power food pellets
-    # powerFoodPelletsDistances = []
-    #
-    # for i in currentGameState.getCapsules():
-    #     powerFoodPelletsDistances.append(util.manhattanDistance(pos, i))
-    #
-    # if len(powerFoodPelletsDistances) > 0:
-    #     closestPowerFoodPellet = min(powerFoodPelletsDistances)
-    #
-    # else:
-    #     closestPowerFoodPellet = 0
-
     # number of food pellets
     foodPellets = len(food)
 
     # ghost distance
     scaredGhosts = []
-    nonScaredGhosts = []
     for g in ghostStates:
-        if not g.scaredTimer:
-            nonScaredGhosts.append(g)
-        else:
+        if g.scaredTimer:
             scaredGhosts.append(g)
-
-
-    closestGhostDistanceNonScared = 0
-    nonScaredManhattanDistances = []
-    if nonScaredGhosts:
-        for i in ghostStates:
-            nonScaredManhattanDistances.append(util.manhattanDistance(pos, i.getPosition()))
-        closestGhostDistanceNonScared = min(nonScaredManhattanDistances)
-
-    else:
-        closestGhostDistanceNonScared = float("inf")
-
-    closestGhostDistanceNonScared = max(closestGhostDistanceNonScared, 5)
-
 
     scaredManhattanDistances = []
     closestGhostDistanceScared = 0
@@ -306,8 +276,8 @@ def betterEvaluationFunction(currentGameState):
     else:
         closestGhostDistanceScared = 0
 
-    score = currentScore + (-1 * closestFoodPellet) + (-2 * (1. / closestGhostDistanceNonScared)) + \
-            (-3 * closestGhostDistanceScared) + (-80 * powerFoodPellets) + (-4 * foodPellets)
+    score = currentScore + (-1 * closestFoodPellet) + (-3 * closestGhostDistanceScared) \
+            + (-80 * powerFoodPellets) + (-4 * foodPellets)
 
     return score
 
