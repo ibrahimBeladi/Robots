@@ -232,7 +232,9 @@ def betterEvaluationFunction(currentGameState):
         2. distance to the non-scared ghosts (manhattan)
         3. distance to the scared ghosts (manhattan)
         4. distance to the closest food pellet (manhattan)
-        5. distance to the closest power food pellet (manhattan)
+        5. # of power food pellets left
+	
+	The highest weight is given to (5), since eating the power food pellet and eating the ghost will improve the score
 
     """
 
