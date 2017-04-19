@@ -71,7 +71,7 @@ class QLearningAgent(ReinforcementAgent):
             return 0.0
         max = None
         for action in self.getLegalActions(state):
-            if self.getQValue(state, action) >= max:
+            if self.getQValue(state, action) > max:
                 max = self.getQValue(state, action)
         return max 
         
@@ -88,12 +88,11 @@ class QLearningAgent(ReinforcementAgent):
             return None
         max, bestAction = None, None
         for action in self.getLegalActions(state):
-            if self.getQValue(state, action) >= max:
+            if self.getQValue(state, action) > max:
                 max = self.getQValue(state, action)
                 bestAction = action
-        return action 
-        
-        
+        return bestAction 
+            
         util.raiseNotDefined()
 
     def getAction(self, state):
@@ -108,12 +107,6 @@ class QLearningAgent(ReinforcementAgent):
           HINT: To pick randomly from a list, use random.choice(list)
         """
         # Pick Action
-        legalActions = self.getLegalActions(state)
-        action = None
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
-        return action
 
     def update(self, state, action, nextState, reward):
         """
@@ -125,10 +118,8 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
-        #self.qValues[(state, action)] = (1-self.alpha)*self.qValues[(state, action)] 
-        #+ self.alpha * (reward+self.discount*self.computeValueFromQValues(nextState))
-        self.qValues[(state,action)] =  ((1-self.alpha) * self.getQValue(state,action)) + self.alpha * (reward + self.discount * self.computeValueFromQValues(nextState))
-        #util.raiseNotDefined()
+        self.qValues[(state, action)] = ((1-self.alpha)*self.getQValue(state,action)) + self.alpha * (reward+self.discount*self.computeValueFromQValues(nextState))
+        
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
