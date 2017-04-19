@@ -98,7 +98,13 @@ class ValueIterationAgent(ValueEstimationAgent):
         if not actions:
             return None
 
-        return max(actions, key=lambda x: self.computeQValueFromValues(state, x))
+        else:
+            qVals = []
+            for i in range(len(actions)):
+                qVals.append(self.computeQValueFromValues(state, actions[i]))
+
+            maxIdx = qVals.index(max(qVals))
+            return actions[maxIdx]
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
