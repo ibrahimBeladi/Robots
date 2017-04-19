@@ -346,7 +346,7 @@ def betterEvaluationFunction(currentGameState):
     else:
         closestGhostDistanceScared = 0
 
-    score = currentScore + (-1 * closestFoodPellet) + (-3 * closestGhostDistanceScared) \
+    score = currentScore + (-10 * closestFoodPellet) + (-5 * closestGhostDistanceScared) \
             + (-80 * powerFoodPellets) + (-4 * foodPellets)
 
     return score
