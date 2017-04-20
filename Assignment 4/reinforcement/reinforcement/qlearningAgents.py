@@ -108,11 +108,11 @@ class QLearningAgent(ReinforcementAgent):
         """
         # Pick Action
         legalActions = self.getLegalActions(state)
-<<<<<<< HEAD
+
         action = None
         "*** YOUR CODE HERE ***"
 
-=======
+
         #action = None
         "*** YOUR CODE HERE ***"
         #util.raiseNotDefined()
@@ -121,7 +121,7 @@ class QLearningAgent(ReinforcementAgent):
                 return random.choice(legalActions)
             return self.computeActionFromQValues(state)
         return None
->>>>>>> origin/master
+
 
     def update(self, state, action, nextState, reward):
         """
